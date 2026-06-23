@@ -40,6 +40,7 @@ class Command:
     emergency_stop: bool | None = None
     paused: bool | None = None
     reset: bool | None = None
+    record: bool | None = None
 
     @staticmethod
     def parse(raw: bytes) -> "Command | None":
@@ -56,6 +57,7 @@ class Command:
             emergency_stop=_as_bool(data.get("emergency_stop")),
             paused=_as_bool(data.get("paused")),
             reset=_as_bool(data.get("reset")),
+            record=_as_bool(data.get("record")),
         )
 
 

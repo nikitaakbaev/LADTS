@@ -9,9 +9,12 @@
 <body>
     <header class="topbar">
         <div class="brand">LADTS · Цифровой двойник линейного привода</div>
-        <div class="conn">
-            <span id="conn-dot" class="dot off"></span>
-            <span id="conn-text">нет соединения</span>
+        <div class="topbar-meta">
+            <span class="timer" id="timer">00:00.0</span>
+            <div class="conn">
+                <span id="conn-dot" class="dot off"></span>
+                <span id="conn-text">нет соединения</span>
+            </div>
         </div>
     </header>
 
@@ -27,6 +30,7 @@
                 <button id="send-target" type="button">Отправить цель</button>
                 <button id="pause" type="button" class="secondary">Пауза</button>
                 <button id="reset" type="button" class="secondary">Сброс</button>
+                <button id="record" type="button" class="secondary record">Запись</button>
                 <button id="estop" type="button" class="estop">АВАРИЙНЫЙ СТОП</button>
             </div>
         </section>

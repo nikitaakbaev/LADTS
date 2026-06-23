@@ -25,16 +25,19 @@ import logging
 import signal
 import time
 
-from simulator.actuator_model import ActuatorModel
+from pathlib import Path
+
+from simulator.actuator_model import ActuatorModel, ActuatorParams
 from simulator.command_consumer import Command, CommandConsumer
-from simulator.controller import PositionController
-from simulator.current_model import compute_current
-from simulator.health import HealthClassifier
-from simulator.load_model import LoadModel
+from simulator.controller import PIDGains, PositionController
+from simulator.current_model import CurrentParams, compute_current
+from simulator.health import HealthClassifier, HealthThresholds
+from simulator.load_model import LoadModel, LoadParams
 from simulator.publisher import TelemetryPublisher
-from simulator.sensors import SensorSuite, TrueState
+from simulator.recorder import TelemetryRecorder
+from simulator.sensors import SensorParams, SensorSuite, TrueState
 from simulator.telemetry import TelemetryFrame
-from simulator.thermal_model import ThermalModel
+from simulator.thermal_model import ThermalModel, ThermalParams
 
 log = logging.getLogger("ladts.main")
 
@@ -44,12 +47,31 @@ SIM_DT = 1.0 / SIM_HZ
 PUB_DT = 1.0 / PUB_HZ
 INITIAL_TARGET = 0.15  # m
 
+REPO_ROOT = Path(__file__).resolve().parent.parent
+RECORDINGS_DIR = REPO_ROOT / "recordings"
+
+
+def _meta_snapshot() -> dict:
+    """Snapshot of every parameter used by the simulator — for reproducibility."""
+    from dataclasses import asdict
+    return {
+        "sim_hz": SIM_HZ, "pub_hz": PUB_HZ,
+        "actuator": asdict(ActuatorParams()),
+        "thermal": asdict(ThermalParams()),
+        "current": asdict(CurrentParams()),
+        "load": asdict(LoadParams()),
+        "sensors": asdict(SensorParams()),
+        "pid": asdict(PIDGains()),
+        "health": asdict(HealthThresholds()),
+    }
+
 
 class Simulator:
     def __init__(self) -> None:
         self._init_models()
         self.publisher = TelemetryPublisher()
         self.commands = CommandConsumer(handler=self._on_command)
+        self.recorder = TelemetryRecorder(RECORDINGS_DIR)
 
         self._latest: TelemetryFrame | None = None
         self._stop = asyncio.Event()
@@ -69,8 +91,12 @@ class Simulator:
 
     def _on_command(self, cmd: Command) -> None:
         if cmd.reset:
+            # Preserve pause state across reset — user expects "go back to
+            # the start in whatever state I'm in", not "reset also resumes".
+            was_paused = self._paused
             self._init_models()
-            log.info("reset: all models reinitialised")
+            self._paused = was_paused
+            log.info("reset: all models reinitialised (paused=%s)", was_paused)
         if cmd.paused is not None:
             self._paused = cmd.paused
             log.info("paused=%s", cmd.paused)
@@ -80,6 +106,11 @@ class Simulator:
         if cmd.target_position is not None:
             self.controller.set_target(cmd.target_position)
             log.info("target_position=%.4f m", cmd.target_position)
+        if cmd.record is not None:
+            if cmd.record and not self.recorder.is_recording:
+                self.recorder.start(meta=_meta_snapshot())
+            elif not cmd.record and self.recorder.is_recording:
+                self.recorder.stop()
 
     # --- physics tick ------------------------------------------------------
 
@@ -113,6 +144,7 @@ class Simulator:
         while not self._stop.is_set():
             if not self._paused:
                 self._latest = self._tick(SIM_DT)
+                self.recorder.write(self._latest)
             next_tick += SIM_DT
             sleep_for = next_tick - asyncio.get_running_loop().time()
             if sleep_for > 0:
@@ -136,6 +168,7 @@ class Simulator:
         try:
             await asyncio.gather(self._simulate(), self._publish_loop())
         finally:
+            self.recorder.stop()
             self.commands.stop()
             self.publisher.stop()
             log.info("Simulator stopped")

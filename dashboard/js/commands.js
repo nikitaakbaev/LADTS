@@ -1,14 +1,17 @@
 import { publishCommand } from "./mqtt_client.js";
 import { ACTUATOR } from "./config.js";
 import { clearHistory } from "./state.js";
+import { timerReset, timerPause, timerResume } from "./timer.js";
 
 let paused = false;
+let recording = false;
 
 export function bindCommandUi() {
     const targetInput = document.getElementById("target-input");
     const sendBtn = document.getElementById("send-target");
     const pauseBtn = document.getElementById("pause");
     const resetBtn = document.getElementById("reset");
+    const recordBtn = document.getElementById("record");
     const stopBtn = document.getElementById("estop");
 
     sendBtn.addEventListener("click", () => {
@@ -23,18 +26,21 @@ export function bindCommandUi() {
         publishCommand({ paused });
         pauseBtn.textContent = paused ? "Продолжить" : "Пауза";
         pauseBtn.classList.toggle("active", paused);
+        if (paused) timerPause(); else timerResume();
     });
 
     resetBtn.addEventListener("click", () => {
+        // Preserve pause state across reset. The simulator does the same.
         publishCommand({ reset: true });
         clearHistory();
-        // If we were paused, also resume so the user immediately sees the reset state.
-        if (paused) {
-            paused = false;
-            publishCommand({ paused: false });
-            pauseBtn.textContent = "Пауза";
-            pauseBtn.classList.remove("active");
-        }
+        timerReset();
+    });
+
+    recordBtn.addEventListener("click", () => {
+        recording = !recording;
+        publishCommand({ record: recording });
+        recordBtn.textContent = recording ? "Остановить запись" : "Запись";
+        recordBtn.classList.toggle("active", recording);
     });
 
     stopBtn.addEventListener("click", () => {

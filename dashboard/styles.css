@@ -30,6 +30,23 @@ body {
     border-bottom: 1px solid var(--line);
 }
 .brand { font-weight: 600; letter-spacing: 0.3px; }
+.topbar-meta {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+.timer {
+    font-variant-numeric: tabular-nums;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--accent);
+    background: var(--panel-2);
+    padding: 4px 12px;
+    border-radius: 4px;
+    border: 1px solid var(--line);
+    min-width: 90px;
+    text-align: center;
+}
 .conn { display: flex; align-items: center; gap: 8px; color: var(--text-dim); }
 .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--err); }
 .dot.on { background: var(--ok); }
@@ -98,6 +115,14 @@ button.secondary {
 }
 button.secondary:hover { background: #28323e; }
 button.secondary.active { background: var(--warn); color: #1a1300; border-color: var(--warn); }
+button.record.active {
+    background: var(--err);
+    color: #fff;
+    border-color: var(--err);
+}
+button.record.active::before {
+    content: "● ";
+}
 button.estop {
     background: var(--err);
     color: #fff;
