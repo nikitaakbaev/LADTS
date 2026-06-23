@@ -28,6 +28,7 @@ import time
 from pathlib import Path
 
 from simulator.actuator_model import ActuatorModel, ActuatorParams
+from simulator.clock import HighResTimer
 from simulator.command_consumer import Command, CommandConsumer
 from simulator.controller import PIDGains, PositionController
 from simulator.current_model import CurrentParams, compute_current
@@ -192,9 +193,10 @@ async def _main() -> None:
         level=logging.INFO,
         format="%(asctime)s %(name)s %(levelname)s %(message)s",
     )
-    sim = Simulator()
-    _install_signal_handlers(sim)
-    await sim.run()
+    with HighResTimer(period_ms=1):
+        sim = Simulator()
+        _install_signal_handlers(sim)
+        await sim.run()
 
 
 if __name__ == "__main__":
