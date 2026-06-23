@@ -11,11 +11,16 @@ const HEALTH_COLOR = {
 const SCENE_LENGTH = 1.6;     // visual length of the rail
 const RAIL_RADIUS  = 0.04;
 const CARRIAGE     = { w: 0.22, h: 0.18, d: 0.18 };
+const BRACKET_GAP  = 0.04;    // small clearance between carriage edge and bracket
 
 function physToScene(x) {
-    // Map physical [x_min, x_max] to scene [-L/2, +L/2].
+    // Map physical [x_min, x_max] to a scene range that keeps the carriage
+    // entirely between the end brackets (±SCENE_LENGTH/2). Without the
+    // half-width compensation the carriage would clip through the brackets
+    // at the extremes of the stroke.
     const u = (x - ACTUATOR.xMin) / (ACTUATOR.xMax - ACTUATOR.xMin);
-    return (u - 0.5) * SCENE_LENGTH;
+    const halfStroke = SCENE_LENGTH / 2 - CARRIAGE.w / 2 - BRACKET_GAP;
+    return (u - 0.5) * 2 * halfStroke;
 }
 
 export function createVisualization(container) {

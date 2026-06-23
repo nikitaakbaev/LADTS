@@ -1,6 +1,11 @@
 const charts = {};
 
-const FONT_BASE = { family: "Inter, system-ui, sans-serif" };
+// Apply once at module init so axis ticks/titles share the same look.
+if (typeof Chart !== "undefined") {
+    Chart.defaults.font.family = "Inter, system-ui, sans-serif";
+    Chart.defaults.font.size = 14;
+    Chart.defaults.color = "#d6deeb";
+}
 
 const baseOpts = (label, color) => ({
     type: "line",
@@ -8,30 +13,35 @@ const baseOpts = (label, color) => ({
         labels: [],
         datasets: [{
             label, data: [], borderColor: color, backgroundColor: color + "33",
-            borderWidth: 1.5, pointRadius: 0, tension: 0.25, fill: true,
+            borderWidth: 2, pointRadius: 0, tension: 0.25, fill: true,
         }],
     },
     options: {
         responsive: true,
         maintainAspectRatio: false,
         animation: false,
+        resizeDelay: 100,
         plugins: {
             legend: {
                 labels: {
                     color: "#d6deeb",
-                    font: { ...FONT_BASE, size: 15, weight: "600" },
-                    boxWidth: 16,
-                    padding: 10,
+                    font: { size: 17, weight: "600" },
+                    boxWidth: 18,
+                    padding: 12,
                 },
+            },
+            tooltip: {
+                titleFont: { size: 14 },
+                bodyFont: { size: 14 },
             },
         },
         scales: {
             x: {
-                ticks: { color: "#8b98a5", maxTicksLimit: 6, font: { ...FONT_BASE, size: 12 } },
+                ticks: { color: "#a5b1c2", maxTicksLimit: 6, font: { size: 13 } },
                 grid: { color: "#1f2630" },
             },
             y: {
-                ticks: { color: "#8b98a5", font: { ...FONT_BASE, size: 12 } },
+                ticks: { color: "#a5b1c2", font: { size: 13 } },
                 grid: { color: "#1f2630" },
             },
         },
