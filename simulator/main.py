@@ -47,6 +47,16 @@ INITIAL_TARGET = 0.15  # m
 
 class Simulator:
     def __init__(self) -> None:
+        self._init_models()
+        self.publisher = TelemetryPublisher()
+        self.commands = CommandConsumer(handler=self._on_command)
+
+        self._latest: TelemetryFrame | None = None
+        self._stop = asyncio.Event()
+        self._paused = False
+
+    def _init_models(self) -> None:
+        """(Re)create all stateful models — used at startup and on /reset."""
         self.actuator = ActuatorModel()
         self.thermal = ThermalModel()
         self.load = LoadModel()
@@ -55,15 +65,15 @@ class Simulator:
         self.controller = PositionController()
         self.controller.set_target(INITIAL_TARGET)
 
-        self.publisher = TelemetryPublisher()
-        self.commands = CommandConsumer(handler=self._on_command)
-
-        self._latest: TelemetryFrame | None = None
-        self._stop = asyncio.Event()
-
     # --- command handling --------------------------------------------------
 
     def _on_command(self, cmd: Command) -> None:
+        if cmd.reset:
+            self._init_models()
+            log.info("reset: all models reinitialised")
+        if cmd.paused is not None:
+            self._paused = cmd.paused
+            log.info("paused=%s", cmd.paused)
         if cmd.emergency_stop is not None:
             self.controller.trigger_estop(cmd.emergency_stop)
             log.info("emergency_stop=%s", cmd.emergency_stop)
@@ -101,7 +111,8 @@ class Simulator:
     async def _simulate(self) -> None:
         next_tick = asyncio.get_running_loop().time()
         while not self._stop.is_set():
-            self._latest = self._tick(SIM_DT)
+            if not self._paused:
+                self._latest = self._tick(SIM_DT)
             next_tick += SIM_DT
             sleep_for = next_tick - asyncio.get_running_loop().time()
             if sleep_for > 0:

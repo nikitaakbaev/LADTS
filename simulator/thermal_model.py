@@ -26,8 +26,16 @@ from dataclasses import dataclass
 
 @dataclass(frozen=True)
 class ThermalParams:
-    alpha: float = 0.6      # K/(s*A^2)
-    beta: float = 0.02      # 1/s
+    # Calibrated so the steady-state temperatures match a realistic
+    # brushed DC actuator of this size:
+    #   T_ss = T_env + (alpha/beta) * I^2
+    #   I = 0.6 A (holding) → ~31 °C
+    #   I = 1.5 A (nominal) → ~60 °C
+    #   I = 3.0 A (overload) → ~165 °C → triggers ERROR
+    # Time constant tau = 1/beta = 20 s — fast enough to settle within
+    # the 8 s chart window when the load drops.
+    alpha: float = 0.78     # K/(s*A^2)
+    beta: float = 0.05      # 1/s
     t_env: float = 25.0     # °C
     t_initial: float = 25.0  # °C
 

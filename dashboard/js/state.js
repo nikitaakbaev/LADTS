@@ -24,6 +24,12 @@ export function setConnection(connected) {
     notify();
 }
 
+export function clearHistory() {
+    for (const k of Object.keys(state.history)) state.history[k] = [];
+    state.last = null;
+    notify();
+}
+
 export function pushTelemetry(frame) {
     state.last = frame;
     const h = state.history;

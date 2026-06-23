@@ -91,6 +91,13 @@ button {
     cursor: pointer;
     white-space: nowrap;
 }
+button.secondary {
+    background: var(--panel-2);
+    color: var(--text);
+    border: 1px solid var(--line);
+}
+button.secondary:hover { background: #28323e; }
+button.secondary.active { background: var(--warn); color: #1a1300; border-color: var(--warn); }
 button.estop {
     background: var(--err);
     color: #fff;

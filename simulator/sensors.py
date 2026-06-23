@@ -27,8 +27,8 @@ class SensorParams:
     current_noise: float = 0.05       # A, std
     temperature_noise: float = 0.1    # °C, std
 
-    drift_rate_temp: float = 0.0005   # °C/s, slow bias growth
-    drift_rate_current: float = 0.0002  # A/s
+    drift_rate_temp: float = 0.00005  # °C/s, very slow bias
+    drift_rate_current: float = 0.00002  # A/s
 
     lag_steps: int = 2                # delay in simulation steps
 

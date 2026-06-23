@@ -38,6 +38,8 @@ log = logging.getLogger("ladts.command")
 class Command:
     target_position: float | None = None
     emergency_stop: bool | None = None
+    paused: bool | None = None
+    reset: bool | None = None
 
     @staticmethod
     def parse(raw: bytes) -> "Command | None":
@@ -52,6 +54,8 @@ class Command:
         return Command(
             target_position=_as_float(data.get("target_position")),
             emergency_stop=_as_bool(data.get("emergency_stop")),
+            paused=_as_bool(data.get("paused")),
+            reset=_as_bool(data.get("reset")),
         )
 
 
