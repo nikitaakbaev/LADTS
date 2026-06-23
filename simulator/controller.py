@@ -2,7 +2,12 @@
 
 State variables:
   * `target_position` — set-point in metres.
-  * `emergency_stop`  — when True, motor force is forced to zero.
+  * `emergency_stop`  — when True, motor force becomes a strong brake
+    proportional to velocity (real linear actuators with a self-locking
+    screw or a brake clamp behave like this on power loss — they don't
+    free-wheel under load). Without this, releasing the controller
+    while a 4 N mean load is applied would slide the carriage to the
+    nearest mechanical stop.
 
 Derivative is taken from the measured velocity (not error derivative)
 to avoid the well-known "derivative kick" on set-point steps.
@@ -18,6 +23,7 @@ class PIDGains:
     ki: float = 30.0
     kd: float = 90.0
     integral_clamp: float = 5.0    # anti-windup limit on integral term
+    estop_brake: float = 600.0     # N·s/m, viscous brake strength on E-stop
 
 
 class PositionController:
@@ -37,7 +43,7 @@ class PositionController:
 
     def step(self, dt: float, position: float, velocity: float) -> float:
         if self.emergency_stop:
-            return 0.0
+            return -self.g.estop_brake * velocity
         err = self.target_position - position
         self._integral += err * dt
         clamp = self.g.integral_clamp

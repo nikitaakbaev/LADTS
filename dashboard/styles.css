@@ -125,6 +125,12 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 }
 .hud-cell b { font-size: 22px; font-variant-numeric: tabular-nums; }
 
+/* Match HUD numeric colors to their chart line colors. */
+.metric-position    { color: #4cc2ff; }
+.metric-current     { color: #f1c40f; }
+.metric-temperature { color: #e74c3c; }
+.metric-velocity    { color: #2ecc71; }
+
 .status { padding: 3px 12px; border-radius: 4px; display: inline-block; font-size: 18px; font-weight: 600; }
 .status.NORMAL  { background: rgba(46,204,113,0.18); color: var(--ok); }
 .status.WARNING { background: rgba(241,196,15,0.18); color: var(--warn); }
@@ -139,10 +145,63 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
     background: var(--line);
     min-height: 0;
 }
-.charts canvas {
+.chart-tile {
     background: var(--panel);
     padding: 8px;
+    cursor: zoom-in;
+    min-height: 0;
+    position: relative;
+    transition: background 0.15s;
+}
+.chart-tile:hover { background: #1a2230; }
+.chart-tile canvas {
     width: 100% !important;
     height: 100% !important;
     min-height: 0;
 }
+
+.modal {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.modal.hidden { display: none; }
+.modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(5, 9, 14, 0.72);
+    cursor: zoom-out;
+}
+.modal-window {
+    position: relative;
+    width: min(92vw, 1200px);
+    height: min(86vh, 800px);
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 22px 22px 16px 22px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+}
+.modal-window canvas {
+    width: 100% !important;
+    height: 100% !important;
+}
+.modal-close {
+    position: absolute;
+    top: 8px;
+    right: 10px;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    background: transparent;
+    color: var(--text);
+    border: 0;
+    border-radius: 4px;
+    font-size: 26px;
+    line-height: 1;
+    cursor: pointer;
+}
+.modal-close:hover { background: var(--panel-2); }

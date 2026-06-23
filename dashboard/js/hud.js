@@ -15,16 +15,22 @@ export function renderHud(state) {
     const text = els.connText();
     dot.classList.toggle("on", state.connected);
     dot.classList.toggle("off", !state.connected);
-    text.textContent = state.connected ? "connected" : "disconnected";
+    text.textContent = state.connected ? "соединено" : "нет соединения";
 
     const f = state.last;
     if (!f) return;
-    els.x().textContent = `${fmt(f.position, 4)} m`;
-    els.v().textContent = `${fmt(f.velocity, 3)} m/s`;
-    els.i().textContent = `${fmt(f.current, 2)} A`;
+    els.x().textContent = `${fmt(f.position, 4)} м`;
+    els.v().textContent = `${fmt(f.velocity, 3)} м/с`;
+    els.i().textContent = `${fmt(f.current, 2)} А`;
     els.t().textContent = `${fmt(f.temperature, 1)} °C`;
 
     const h = els.health();
-    h.textContent = f.health;
+    h.textContent = HEALTH_RU[f.health] ?? f.health;
     h.className = `status ${f.health}`;
 }
+
+const HEALTH_RU = {
+    NORMAL: "НОРМА",
+    WARNING: "ВНИМАНИЕ",
+    ERROR: "ОШИБКА",
+};

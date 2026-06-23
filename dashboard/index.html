@@ -2,16 +2,16 @@
 <html lang="ru">
 <head>
     <meta charset="utf-8" />
-    <title>LADTS — Digital Twin Dashboard</title>
+    <title>LADTS — Цифровой двойник линейного привода</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
     <header class="topbar">
-        <div class="brand">LADTS · Linear Actuator Digital Twin</div>
+        <div class="brand">LADTS · Цифровой двойник линейного привода</div>
         <div class="conn">
             <span id="conn-dot" class="dot off"></span>
-            <span id="conn-text">disconnected</span>
+            <span id="conn-text">нет соединения</span>
         </div>
     </header>
 
@@ -20,33 +20,41 @@
             <div id="scene" class="scene"></div>
             <div class="controls">
                 <label>
-                    Target position, m
+                    Целевая позиция, м
                     <input id="target-input" type="number" min="0" max="0.30"
                            step="0.005" value="0.15" />
                 </label>
-                <button id="send-target" type="button">Send target</button>
-                <button id="estop" type="button" class="estop">EMERGENCY STOP</button>
+                <button id="send-target" type="button">Отправить цель</button>
+                <button id="estop" type="button" class="estop">АВАРИЙНЫЙ СТОП</button>
             </div>
         </section>
 
         <section class="data-pane">
             <div class="hud">
-                <div class="hud-cell"><span>Position</span><b id="hud-x">— m</b></div>
-                <div class="hud-cell"><span>Velocity</span><b id="hud-v">— m/s</b></div>
-                <div class="hud-cell"><span>Current</span><b id="hud-i">— A</b></div>
-                <div class="hud-cell"><span>Temperature</span><b id="hud-t">— °C</b></div>
-                <div class="hud-cell hud-status"><span>Health</span>
+                <div class="hud-cell"><span>Позиция</span><b id="hud-x" class="metric-position">— м</b></div>
+                <div class="hud-cell"><span>Скорость</span><b id="hud-v" class="metric-velocity">— м/с</b></div>
+                <div class="hud-cell"><span>Ток</span><b id="hud-i" class="metric-current">— А</b></div>
+                <div class="hud-cell"><span>Температура</span><b id="hud-t" class="metric-temperature">— °C</b></div>
+                <div class="hud-cell hud-status"><span>Состояние</span>
                     <b id="hud-health" class="status NORMAL">—</b>
                 </div>
             </div>
             <div class="charts">
-                <canvas id="chart-position"></canvas>
-                <canvas id="chart-current"></canvas>
-                <canvas id="chart-temperature"></canvas>
-                <canvas id="chart-velocity"></canvas>
+                <div class="chart-tile" data-chart="position"    title="Нажмите, чтобы увеличить"><canvas id="chart-position"></canvas></div>
+                <div class="chart-tile" data-chart="current"     title="Нажмите, чтобы увеличить"><canvas id="chart-current"></canvas></div>
+                <div class="chart-tile" data-chart="temperature" title="Нажмите, чтобы увеличить"><canvas id="chart-temperature"></canvas></div>
+                <div class="chart-tile" data-chart="velocity"    title="Нажмите, чтобы увеличить"><canvas id="chart-velocity"></canvas></div>
             </div>
         </section>
     </main>
+
+    <div id="chart-modal" class="modal hidden" role="dialog" aria-modal="true">
+        <div class="modal-backdrop" data-close="true"></div>
+        <div class="modal-window">
+            <button class="modal-close" type="button" aria-label="Закрыть" data-close="true">×</button>
+            <canvas id="chart-modal-canvas"></canvas>
+        </div>
+    </div>
 
     <script type="importmap">
     {
