@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.env
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Local logs / scratch
+*.log
+*.tmp
+
+# MQTT broker artefacts (if persistence is ever turned on)
+mosquitto.db

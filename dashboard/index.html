@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8" />
+    <title>LADTS — Digital Twin Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+    <header class="topbar">
+        <div class="brand">LADTS · Linear Actuator Digital Twin</div>
+        <div class="conn">
+            <span id="conn-dot" class="dot off"></span>
+            <span id="conn-text">disconnected</span>
+        </div>
+    </header>
+
+    <main class="layout">
+        <section class="scene-pane">
+            <div id="scene" class="scene"></div>
+            <div class="controls">
+                <label>
+                    Target position, m
+                    <input id="target-input" type="number" min="0" max="0.30"
+                           step="0.005" value="0.15" />
+                </label>
+                <button id="send-target" type="button">Send target</button>
+                <button id="estop" type="button" class="estop">EMERGENCY STOP</button>
+            </div>
+        </section>
+
+        <section class="data-pane">
+            <div class="hud">
+                <div class="hud-cell"><span>Position</span><b id="hud-x">— m</b></div>
+                <div class="hud-cell"><span>Velocity</span><b id="hud-v">— m/s</b></div>
+                <div class="hud-cell"><span>Current</span><b id="hud-i">— A</b></div>
+                <div class="hud-cell"><span>Temperature</span><b id="hud-t">— °C</b></div>
+                <div class="hud-cell hud-status"><span>Health</span>
+                    <b id="hud-health" class="status NORMAL">—</b>
+                </div>
+            </div>
+            <div class="charts">
+                <canvas id="chart-position"></canvas>
+                <canvas id="chart-current"></canvas>
+                <canvas id="chart-temperature"></canvas>
+                <canvas id="chart-velocity"></canvas>
+            </div>
+        </section>
+    </main>
+
+    <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+      }
+    }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mqtt@5.10.1/dist/mqtt.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.js"></script>
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>

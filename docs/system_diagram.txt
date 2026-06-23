@@ -1,0 +1,66 @@
+LADTS — Linear Actuator Digital Twin · system data flow
+=========================================================
+
++-----------------------------------------------------------------------+
+|                     PHYSICAL TWIN  (Python, asyncio)                  |
+|                                                                       |
+|  +-------------+    +----------------+    +----------------------+    |
+|  | controller  |--->| actuator_model |--->|  thermal_model       |    |
+|  | PID + estop |    | m·dv/dt = ...  |    |  dT/dt=αI²-β(T-T_env)|    |
+|  +------^------+    | RK4 @ 200 Hz   |    +-----------+----------+    |
+|         |           +-------+--------+                |               |
+|         |                   |                         |               |
+|         |          +--------+--------+      +---------+----------+    |
+|         |          |   load_model    |      |   current_model    |    |
+|         |          |  OU + spikes    |      |  I=k1|F|+k2|L|+I0  |    |
+|         |          +-----------------+      +---------+----------+    |
+|         |                                             |               |
+|         |                                             v               |
+|         |                                  +--------------------+     |
+|         |                                  |     sensors        |     |
+|         |                                  |  noise+drift+lag   |     |
+|         |                                  +---------+----------+     |
+|         |                                            |                |
+|         |                                            v                |
+|         |                                  +--------------------+     |
+|         |                                  |      health        |     |
+|         |                                  | NORMAL/WARN/ERROR  |     |
+|         |                                  | (hysteresis)       |     |
+|         |                                  +---------+----------+     |
+|         |                                            |                |
+|         |                                            v                |
+|  +------+-------+                            +----------------+       |
+|  | command      |                            |   publisher    |       |
+|  | consumer     |                            |  paho-mqtt     |       |
+|  +------^-------+                            +-------+--------+       |
++---------|--------------------------------------------|----------------+
+          | subscribe QoS 1                            | publish 30 Hz
+          | digital_twin/actuator/command              | telemetry QoS 0
+          |                                            | status QoS 1, retained, LWT
+          |       +-----------------------------------+
+          |       |
+          |       v
++---------+----------------------+
+|     MOSQUITTO BROKER           |
+|     :1883  TCP (Python)        |
+|     :9001  WebSocket (browser) |
++---------+----------------------+
+          |   ws://host:9001
+          v
++-----------------------------------------------------------------------+
+|                 VIRTUAL TWIN  (Browser, ES modules)                   |
+|                                                                       |
+|  +----------------+   +---------------+   +------------------------+  |
+|  |  mqtt_client   |-->|    state.js   |-->|     visualization      |  |
+|  |  mqtt.js / WS  |   |  last + ring  |   |  Three.js scene        |  |
+|  |  reconnect 2 s |   |  pub/sub      |   |  carriage color=health |  |
+|  +----------------+   +-------+-------+   +------------------------+  |
+|          ^                    |                                       |
+|          |                    +-->  hud.js    (numeric readouts)      |
+|          |                    +-->  charts.js (Chart.js, 10 Hz)       |
+|          |                                                            |
+|  +-------+--------+                                                   |
+|  |  commands.js   |    target_position / emergency_stop               |
+|  |  publish QoS 1 |    --> digital_twin/actuator/command              |
+|  +----------------+                                                   |
++-----------------------------------------------------------------------+
