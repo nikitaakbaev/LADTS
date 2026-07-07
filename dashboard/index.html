@@ -28,6 +28,21 @@
                            step="0.005" value="0.15" />
                 </label>
                 <button id="send-target" type="button">Отправить цель</button>
+
+                <div class="motor-selector">
+                    <span class="motor-selector-label">Двигатель</span>
+                    <div class="motor-btn-group">
+                        <button id="motor-BLH5100KC" type="button" class="motor-btn active"
+                                data-motor="BLH5100KC" title="Oriental Motor BLH5100KC — 100 Вт, 24 В DC">
+                            BLH5100KC<br><small>100 Вт · 24 В DC</small>
+                        </button>
+                        <button id="motor-BLE230" type="button" class="motor-btn"
+                                data-motor="BLE230" title="Oriental Motor BLE230 — 30 Вт, AC">
+                            BLE230<br><small>30 Вт · AC</small>
+                        </button>
+                    </div>
+                </div>
+
                 <button id="pause" type="button" class="secondary">Пауза</button>
                 <button id="reset" type="button" class="secondary">Сброс</button>
                 <button id="record" type="button" class="secondary record">Запись</button>
@@ -44,6 +59,7 @@
                 <div class="hud-cell hud-status"><span>Состояние</span>
                     <b id="hud-health" class="status NORMAL">—</b>
                 </div>
+                <div class="hud-cell"><span>Двигатель</span><b id="hud-motor" class="metric-motor">—</b></div>
             </div>
             <div class="charts">
                 <div class="chart-tile" data-chart="position"    title="Нажмите, чтобы увеличить"><canvas id="chart-position"></canvas></div>

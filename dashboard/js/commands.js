@@ -5,14 +5,15 @@ import { timerReset, timerPause, timerResume } from "./timer.js";
 
 let paused = false;
 let recording = false;
+let activeMotor = "BLH5100KC";
 
 export function bindCommandUi() {
     const targetInput = document.getElementById("target-input");
-    const sendBtn = document.getElementById("send-target");
-    const pauseBtn = document.getElementById("pause");
-    const resetBtn = document.getElementById("reset");
-    const recordBtn = document.getElementById("record");
-    const stopBtn = document.getElementById("estop");
+    const sendBtn     = document.getElementById("send-target");
+    const pauseBtn    = document.getElementById("pause");
+    const resetBtn    = document.getElementById("reset");
+    const recordBtn   = document.getElementById("record");
+    const stopBtn     = document.getElementById("estop");
 
     sendBtn.addEventListener("click", () => {
         const raw = parseFloat(targetInput.value);
@@ -30,7 +31,6 @@ export function bindCommandUi() {
     });
 
     resetBtn.addEventListener("click", () => {
-        // Preserve pause state across reset. The simulator does the same.
         publishCommand({ reset: true });
         clearHistory();
         timerReset();
@@ -46,4 +46,27 @@ export function bindCommandUi() {
     stopBtn.addEventListener("click", () => {
         publishCommand({ emergency_stop: true });
     });
+
+    // Motor selector buttons
+    document.querySelectorAll(".motor-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+            const motorId = btn.dataset.motor;
+            if (motorId === activeMotor) return;
+            activeMotor = motorId;
+            // Update active state on all motor buttons
+            document.querySelectorAll(".motor-btn").forEach(b =>
+                b.classList.toggle("active", b.dataset.motor === motorId)
+            );
+            publishCommand({ select_motor: motorId });
+        });
+    });
+}
+
+/** Sync the motor selector buttons to the motor_id reported in telemetry. */
+export function syncMotorUi(motorId) {
+    if (!motorId || motorId === activeMotor) return;
+    activeMotor = motorId;
+    document.querySelectorAll(".motor-btn").forEach(b =>
+        b.classList.toggle("active", b.dataset.motor === motorId)
+    );
 }

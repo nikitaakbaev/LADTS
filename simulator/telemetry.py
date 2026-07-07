@@ -27,6 +27,7 @@ class TelemetryFrame:
     force_load: float        # N
     target_position: float   # m
     health: HealthStatus
+    motor_id: str = "BLH5100KC"  # active motor identifier
 
     @staticmethod
     def now(**fields: float | str) -> "TelemetryFrame":

@@ -137,7 +137,7 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 }
 .hud {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(6, 1fr);
     gap: 1px;
     background: var(--line);
 }
@@ -237,3 +237,55 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
     cursor: pointer;
 }
 .modal-close:hover { background: var(--panel-2); }
+
+/* Motor selector */
+.motor-selector {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+.motor-selector-label {
+    font-size: 12px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    font-weight: 600;
+}
+.motor-btn-group {
+    display: flex;
+    gap: 6px;
+}
+.motor-btn {
+    height: auto;
+    padding: 5px 12px;
+    background: var(--panel-2);
+    color: var(--text);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.4;
+    text-align: center;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+.motor-btn small {
+    display: block;
+    font-weight: 400;
+    color: var(--text-dim);
+    font-size: 10px;
+}
+.motor-btn:hover { background: #28323e; }
+.motor-btn.active {
+    background: rgba(76, 194, 255, 0.15);
+    border-color: var(--accent);
+    color: var(--accent);
+}
+.motor-btn.active small { color: var(--accent); opacity: 0.7; }
+
+/* HUD motor cell */
+.metric-motor {
+    font-size: 14px;
+    color: var(--accent);
+    font-variant-numeric: tabular-nums;
+}

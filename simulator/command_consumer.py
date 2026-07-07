@@ -7,7 +7,8 @@ the publisher and consumer can be restarted independently.
 Command schema (any subset of fields):
 
     { "target_position": 0.20,
-      "emergency_stop": false }
+      "emergency_stop": false,
+      "select_motor": "BLE230" }
 
 Malformed payloads are logged and dropped, never raised — a bad message
 must not kill the simulator loop.
@@ -41,6 +42,7 @@ class Command:
     paused: bool | None = None
     reset: bool | None = None
     record: bool | None = None
+    select_motor: str | None = None   # motor ID, e.g. "BLH5100KC" or "BLE230"
 
     @staticmethod
     def parse(raw: bytes) -> "Command | None":
@@ -58,6 +60,7 @@ class Command:
             paused=_as_bool(data.get("paused")),
             reset=_as_bool(data.get("reset")),
             record=_as_bool(data.get("record")),
+            select_motor=_as_str(data.get("select_motor")),
         )
 
 
@@ -69,6 +72,12 @@ def _as_float(v: object) -> float | None:
 
 def _as_bool(v: object) -> bool | None:
     if isinstance(v, bool):
+        return v
+    return None
+
+
+def _as_str(v: object) -> str | None:
+    if isinstance(v, str) and v:
         return v
     return None
 
